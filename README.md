@@ -1,1 +1,1 @@
-# sephora_scrapy_project
+# Sephora Scrapy Project
