@@ -37,9 +37,20 @@ class SephoraSpider(CrawlSpider):
 
     def parse_item(self, response):
 
+        brand_name = response.xpath(
+            "//span[@class='css-euydo4']//text()"
+        ).extract_first()
+
         item_name = response.xpath(
             "//span[@class='css-0']//text()"
         ).extract_first()
+
+        price = response.xpath(
+            "//div[@data-comp='Price Box']//text()"
+        ).extract_first()
+
         yield {
-            "item_name": item_name
+            "brand_name": brand_name,
+            "item_name": item_name,
+            "price": price
         }
