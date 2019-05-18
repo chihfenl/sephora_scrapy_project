@@ -38,10 +38,12 @@ class SephoraSpider(CrawlSpider):
     def parse_item(self, response):
 
         brand_name = response.xpath(
+            "//h1[@data-comp='DisplayName Flex Box']" +
             "//span[@class='css-euydo4']//text()"
         ).extract_first()
 
         item_name = response.xpath(
+            "//h1[@data-comp='DisplayName Flex Box']" +
             "//span[@class='css-0']//text()"
         ).extract_first()
 
@@ -49,8 +51,15 @@ class SephoraSpider(CrawlSpider):
             "//div[@data-comp='Price Box']//text()"
         ).extract_first()
 
+        ingredient = response.xpath(
+            "//div[@data-at='product_tabs_section']" +
+            "//div[@id='tabpanel2']" +
+            "//div[@class='css-pz80c5']//text()"
+        ).extract_first()
+
         yield {
             "brand_name": brand_name,
             "item_name": item_name,
-            "price": price
+            "price": price,
+            "ingredient": ingredient
         }
