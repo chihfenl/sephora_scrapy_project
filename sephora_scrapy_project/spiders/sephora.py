@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider, Rule
+from scrapy.loader import ItemLoader
+from sephora_scrapy_project.items import SephoraScrapyProjectItem
 
 
 class SephoraSpider(CrawlSpider):
@@ -35,31 +37,48 @@ class SephoraSpider(CrawlSpider):
         )
     ]
 
+    def _get_ingredient_order(self, response):
+
+        index = 0
+
+        for tab in response.xpath(
+            "//div[@data-at='product_tabs_section']" +
+            "//div[@role='tablist']//button//text()"
+        ).extract():
+
+            if tab == 'Ingredients':
+                return str(index)
+            index += 1
+
     def parse_item(self, response):
 
-        brand_name = response.xpath(
+        loader = ItemLoader(item=SephoraScrapyProjectItem(), response=response)
+
+        loader.add_xpath(
+            'brand_name',
             "//h1[@data-comp='DisplayName Flex Box']" +
             "//span[@class='css-euydo4']//text()"
-        ).extract_first()
+        )
 
-        item_name = response.xpath(
+        loader.add_xpath(
+            'item_name',
             "//h1[@data-comp='DisplayName Flex Box']" +
             "//span[@class='css-0']//text()"
-        ).extract_first()
+        )
 
-        price = response.xpath(
+        loader.add_xpath(
+            'price',
             "//div[@data-comp='Price Box']//text()"
-        ).extract_first()
+        )
 
-        ingredient = response.xpath(
-            "//div[@data-at='product_tabs_section']" +
-            "//div[@id='tabpanel2']" +
-            "//div[@class='css-pz80c5']//text()"
-        ).extract_first()
+        ingredient_order = self._get_ingredient_order(response)
 
-        yield {
-            "brand_name": brand_name,
-            "item_name": item_name,
-            "price": price,
-            "ingredient": ingredient
-        }
+        if ingredient_order:
+            tabpanel_number = ''.join(['tabpanel', ingredient_order])
+            xpath_str = \
+                "//div[@data-at='product_tabs_section']" + \
+                "//div[@id='{}']".format(tabpanel_number) + \
+                "//div[@class='css-pz80c5']//text()"
+            loader.add_xpath('ingredient', xpath_str)
+
+        return loader.load_item()

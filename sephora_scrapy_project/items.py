@@ -9,6 +9,8 @@ import scrapy
 
 
 class SephoraScrapyProjectItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+
+    brand_name = scrapy.Field()
+    item_name = scrapy.Field()
+    price = scrapy.Field()
+    ingredient = scrapy.Field()
