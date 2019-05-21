@@ -14,6 +14,8 @@ from scrapy.http import HtmlResponse
 from selenium.webdriver.remote.remote_connection import LOGGER
 from selenium.webdriver.chrome.options import Options
 
+TOTAL_ITEM_GROUPS = 5
+
 
 class ChromeWebDriver(object):
 
@@ -23,13 +25,19 @@ class ChromeWebDriver(object):
         self.driver = webdriver.Chrome(chrome_options=options)
 
     def _scroll_page_down(self):
-        total_item_groups = 5
-        for group_num in range(0, total_item_groups):
+        total_groups_str = str(TOTAL_ITEM_GROUPS)
+        for group_num in range(0, TOTAL_ITEM_GROUPS):
             self.driver.execute_script(
-                "window.scrollTo(" +
-                "document.body.scrollHeight*{}/5,".format(str(group_num)) +
-                " document.body.scrollHeight*{}/5".format(str(group_num + 1)) +
-                ");"
+                """
+                window.scrollTo(
+                document.body.scrollHeight*{}/{},
+                document.body.scrollHeight*{}/{}
+                );
+                """
+                .format(
+                    str(group_num), total_groups_str,
+                    str(group_num + 1), total_groups_str
+                )
             )
             time.sleep(50.0 / 1000.0)
 
