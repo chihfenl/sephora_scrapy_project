@@ -5,7 +5,42 @@
 # See documentation in:
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
+import time
+import logging
+
 from scrapy import signals
+from selenium import webdriver
+from scrapy.http import HtmlResponse
+from selenium.webdriver.remote.remote_connection import LOGGER
+from selenium.webdriver.chrome.options import Options
+
+
+class ChromeWebDriver(object):
+
+    def __init__(self):
+        options = Options()
+        options.add_argument('--headless')
+        self.driver = webdriver.Chrome(chrome_options=options)
+
+    def _scroll_page_down(self):
+        total_item_groups = 5
+        for group_num in range(0, total_item_groups):
+            self.driver.execute_script(
+                "window.scrollTo(" +
+                "document.body.scrollHeight*{}/5,".format(str(group_num)) +
+                " document.body.scrollHeight*{}/5".format(str(group_num + 1)) +
+                ");"
+            )
+            time.sleep(50.0 / 1000.0)
+
+    def safe_get_full_page_body(self, page_url):
+        self.driver.get(page_url)
+        self._scroll_page_down()
+        return self.driver.page_source.encode('utf-8')
+
+    def close_driver(self):
+        if self.driver:
+            self.driver.quit()
 
 
 class SephoraScrapyProjectSpiderMiddleware(object):
@@ -68,17 +103,15 @@ class SephoraScrapyProjectDownloaderMiddleware(object):
         crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
         return s
 
-    def process_request(self, request, spider):
-        # Called for each request that goes through the downloader
-        # middleware.
-
-        # Must either:
-        # - return None: continue processing this request
-        # - or return a Response object
-        # - or return a Request object
-        # - or raise IgnoreRequest: process_exception() methods of
-        #   installed downloader middleware will be called
-        return None
+    @classmethod
+    def process_request(cls, request, spider):
+        if '/all' in request.url:
+            LOGGER.setLevel(logging.WARNING)
+            chrome_webdriver = ChromeWebDriver()
+            body = chrome_webdriver.safe_get_full_page_body(request.url)
+            chrome_webdriver.close_driver()
+            return HtmlResponse(
+                request.url, encoding='utf-8', body=body, request=request)
 
     def process_response(self, request, response, spider):
         # Called with the response returned from the downloader.
