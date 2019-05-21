@@ -41,12 +41,12 @@ class SephoraSpider(CrawlSpider):
 
         index = 0
 
-        for tab in response.xpath(
+        for tab_name in response.xpath(
             "//div[@data-at='product_tabs_section']" +
             "//div[@role='tablist']//button//text()"
         ).extract():
 
-            if tab == 'Ingredients':
+            if tab_name == 'Ingredients':
                 return str(index)
             index += 1
 
