@@ -113,7 +113,7 @@ class SephoraScrapyProjectDownloaderMiddleware(object):
 
     @classmethod
     def process_request(cls, request, spider):
-        if '/all' in request.url:
+        if '/all' in request.url or '/product' in request.url:
             LOGGER.setLevel(logging.WARNING)
             chrome_webdriver = ChromeWebDriver()
             body = chrome_webdriver.safe_get_full_page_body(request.url)
