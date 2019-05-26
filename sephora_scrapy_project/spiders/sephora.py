@@ -1,8 +1,15 @@
 # -*- coding: utf-8 -*-
+import os
+import sys
+
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.loader import ItemLoader
 from sephora_scrapy_project.items import SephoraScrapyProjectItem
+
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+
+from libs.sephora_next_link_extractor import SephoraNextLinkExtractor
 
 
 class SephoraSpider(CrawlSpider):
@@ -26,6 +33,7 @@ class SephoraSpider(CrawlSpider):
             ),
             follow=True
         ),
+        Rule(SephoraNextLinkExtractor(), follow=True),
         Rule(
             LinkExtractor(
                 allow=".*",
@@ -37,18 +45,24 @@ class SephoraSpider(CrawlSpider):
         )
     ]
 
-    def _get_ingredient_order(self, response):
+    def _get_detail_and_ingredient_column_num(self, response):
 
         index = 0
+        detail_col_num = None
+        ingredient_col_num = None
 
         for tab_name in response.xpath(
             "//div[@data-at='product_tabs_section']" +
             "//div[@role='tablist']//button//text()"
         ).extract():
 
+            if tab_name == 'Details':
+                detail_col_num = str(index)
             if tab_name == 'Ingredients':
-                return str(index)
+                ingredient_col_num = str(index)
             index += 1
+
+        return (detail_col_num, ingredient_col_num)
 
     def parse_item(self, response):
 
@@ -71,10 +85,19 @@ class SephoraSpider(CrawlSpider):
             "//div[@data-comp='Price Box']//text()"
         )
 
-        ingredient_order = self._get_ingredient_order(response)
+        detail_col_num, ingredient_col_num = \
+            self._get_detail_and_ingredient_column_num(response)
 
-        if ingredient_order:
-            tabpanel_number = ''.join(['tabpanel', ingredient_order])
+        if detail_col_num:
+            tabpanel_number = ''.join(['tabpanel', detail_col_num])
+            xpath_str = \
+                "//div[@data-at='product_tabs_section']" + \
+                "//div[@id='{}']".format(tabpanel_number) + \
+                "//div[@class='css-pz80c5']//text()"
+            loader.add_xpath('details', xpath_str)
+
+        if ingredient_col_num:
+            tabpanel_number = ''.join(['tabpanel', ingredient_col_num])
             xpath_str = \
                 "//div[@data-at='product_tabs_section']" + \
                 "//div[@id='{}']".format(tabpanel_number) + \

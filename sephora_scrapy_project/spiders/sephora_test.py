@@ -2,12 +2,9 @@
 import sys
 import os
 
-from six.moves.urllib.parse import urljoin
-from scrapy.http import Request
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.loader import ItemLoader
-from scrapy.utils.python import to_native_str
 from sephora_scrapy_project.items import SephoraScrapyProjectItem
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
