@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
+import re
 
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider, Rule
@@ -45,24 +46,46 @@ class SephoraSpider(CrawlSpider):
         )
     ]
 
-    def _get_detail_and_ingredient_column_num(self, response):
+    def get_detail_and_ingredient_column_num(self, response, col_name):
 
         index = 0
-        details_col_num = None
-        ingredient_col_num = None
+        col_num = None
 
         for tab_name in response.xpath(
             "//div[@data-at='product_tabs_section']" +
             "//div[@role='tablist']//button//text()"
         ).extract():
 
-            if tab_name == 'Details':
-                details_col_num = str(index)
-            if tab_name == 'Ingredients':
-                ingredient_col_num = str(index)
+            if tab_name == col_name:
+                col_num = str(index)
             index += 1
 
-        return (details_col_num, ingredient_col_num)
+        return col_num
+
+    def get_detail_and_ingredient_xpath(self, response, col_name):
+
+        col_num = self.get_detail_and_ingredient_column_num(response, col_name)
+
+        if not col_num:
+            return None
+
+        tabpanel_number = ''.join(['tabpanel', col_num])
+        xpath_str = \
+            "//div[@data-at='product_tabs_section']" + \
+            "//div[@id='{}']".format(tabpanel_number) + \
+            "//div[@class='css-pz80c5']//text()"
+        return xpath_str
+
+    def get_image_url(self, response):
+
+        image_info = response.xpath(
+            "//svg[@class='css-1ixbp0l']//image"
+        ).extract_first()
+        match_groups = re.search(r'xlink:href=\"(.*?)\"', image_info)
+        relative_url = match_groups.group(1)
+        absolute_url = response.urljoin(relative_url)
+
+        return absolute_url
 
     def parse_item(self, response):
 
@@ -85,18 +108,15 @@ class SephoraSpider(CrawlSpider):
             "//div[@data-comp='Price Box']//text()"
         )
 
-        details_col_num, ingredient_col_num = \
-            self._get_detail_and_ingredient_column_num(response)
+        details_xpath = \
+            self.get_detail_and_ingredient_xpath(response, 'Details')
+        loader.add_xpath('details', details_xpath)
 
-        for col_name, col_num in [
-            ('details', details_col_num), ('ingredient', ingredient_col_num)
-        ]:
-            if col_num:
-                tabpanel_number = ''.join(['tabpanel', col_num])
-                xpath_str = \
-                    "//div[@data-at='product_tabs_section']" + \
-                    "//div[@id='{}']".format(tabpanel_number) + \
-                    "//div[@class='css-pz80c5']//text()"
-                loader.add_xpath(col_name, xpath_str)
+        ingredient_xpath = \
+            self.get_detail_and_ingredient_xpath(response, 'Ingredient')
+        loader.add_xpath('ingredient', ingredient_xpath)
+
+        image_url = self.get_image_url(response)
+        loader.add_value('image_url', image_url)
 
         return loader.load_item()
