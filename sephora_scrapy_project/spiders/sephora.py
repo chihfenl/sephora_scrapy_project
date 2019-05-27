@@ -129,9 +129,9 @@ class SephoraSpider(CrawlSpider):
             loader.add_xpath('details', details_xpath)
 
         ingredient_xpath = \
-            self.get_detail_and_ingredient_xpath(response, 'Ingredient')
+            self.get_detail_and_ingredient_xpath(response, 'Ingredients')
         if ingredient_xpath:
-            loader.add_xpath('ingredient', ingredient_xpath)
+            loader.add_xpath('ingredients', ingredient_xpath)
 
         image_url = self.get_image_url(response)
         loader.add_value('image_url', image_url)
