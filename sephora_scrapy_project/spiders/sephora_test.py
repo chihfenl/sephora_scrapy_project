@@ -35,31 +35,46 @@ class SephoraTestSpider(CrawlSpider):
     def parse_item(self, response):
 
         loader = ItemLoader(item=SephoraScrapyProjectItem(), response=response)
-        
+
+        loader.add_xpath(
+            'category',
+            "//a[@class='css-1ylrown ']//text()"
+        )
+
+        loader.add_xpath(
+            'subcategory',
+            "//a[@class='css-1ylrown ']//text()"
+        )
+
+        loader.add_xpath(
+            'subsubcategory',
+            "//h1[@class='css-bnsadm ']//text()"
+        )
+
         image_info = response.xpath(
             "//svg[@class='css-1ixbp0l']//image"
         ).extract_first()
         match_groups = re.search(r'xlink:href=\"(.*?)\"', image_info)
         relative_url = match_groups.group(1)
         absolute_url = response.urljoin(relative_url)
-        
+
         loader.add_value('image_url', absolute_url)
-        
-        #loader.add_xpath(
-        #    'brand_name',
-        #    "//h1[@data-comp='DisplayName Flex Box']" +
-        #    "//span[@class='css-euydo4']//text()"
-        #)
-#
-        #loader.add_xpath(
-        #    'item_name',
-        #    "//h1[@data-comp='DisplayName Flex Box']" +
-        #    "//span[@class='css-0']//text()"
-        #)
-#
-        #loader.add_xpath(
-        #    'price',
-        #    "//div[@data-comp='Price Box']//text()"
-        #)
+
+        loader.add_xpath(
+            'brand_name',
+            "//h1[@data-comp='DisplayName Flex Box']" +
+            "//span[@class='css-euydo4']//text()"
+        )
+
+        loader.add_xpath(
+            'item_name',
+            "//h1[@data-comp='DisplayName Flex Box']" +
+            "//span[@class='css-0']//text()"
+        )
+
+        loader.add_xpath(
+            'price',
+            "//div[@data-comp='Price Box']//text()"
+        )
 
         yield loader.load_item()

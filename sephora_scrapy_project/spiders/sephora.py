@@ -108,6 +108,21 @@ class SephoraSpider(CrawlSpider):
             "//div[@data-comp='Price Box']//text()"
         )
 
+        loader.add_xpath(
+            'category',
+            "//a[@class='css-1ylrown ']//text()"
+        )
+
+        loader.add_xpath(
+            'subcategory',
+            "//a[@class='css-1ylrown ']//text()"
+        )
+
+        loader.add_xpath(
+            'subsubcategory',
+            "//h1[@class='css-bnsadm ']//text()"
+        )
+
         details_xpath = \
             self.get_detail_and_ingredient_xpath(response, 'Details')
         if details_xpath:
