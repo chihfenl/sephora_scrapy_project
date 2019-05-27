@@ -93,8 +93,12 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
+    'scrapy.pipelines.images.ImagesPipeline': 1,
     'sephora_scrapy_project.pipelines.SephoraScrapyProjectPipeline': 300,
 }
+
+#IMAGES_STORE = '/Users/chih-fenglin/Documents/github_project/web-scraping-project/sephora_scrapy_project'
+#DOWNLOAD_TIMEOUT = 1200
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html

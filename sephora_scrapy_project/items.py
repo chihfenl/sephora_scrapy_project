@@ -15,3 +15,5 @@ class SephoraScrapyProjectItem(scrapy.Item):
     price = scrapy.Field()
     details = scrapy.Field()
     ingredient = scrapy.Field()
+    image_url = scrapy.Field()
+    #images = scrapy.Field()
