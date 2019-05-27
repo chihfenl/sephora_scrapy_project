@@ -1,0 +1,5 @@
+Scrapy==1.6.0
+selenium==3.141.0
+scrapy-splash==0.7.2
+Pillow==6.0.0
+beautifulsoup4==4.7.1
