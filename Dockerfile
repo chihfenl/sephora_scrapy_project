@@ -21,7 +21,7 @@ RUN apk add --update --no-cache \
     libffi \
     libffi-dev \
     libxslt-dev \
-	build-base \
+    build-base \
     python-dev \
     py-pip \
     jpeg-dev \
