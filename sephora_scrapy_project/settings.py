@@ -14,9 +14,6 @@ import random
 
 BOT_NAME = 'sephora_scrapy_project'
 
-# Include chrome driver in this project
-PATH = "$PATH:../chromedriver"
-
 SPIDER_MODULES = ['sephora_scrapy_project.spiders']
 NEWSPIDER_MODULE = 'sephora_scrapy_project.spiders'
 
