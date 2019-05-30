@@ -6,6 +6,7 @@ import re
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.loader import ItemLoader
+from scrapy.loader.processors import TakeFirst
 from sephora_scrapy_project.items import SephoraScrapyProjectItem
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
@@ -90,6 +91,7 @@ class SephoraSpider(CrawlSpider):
     def parse_item(self, response):
 
         loader = ItemLoader(item=SephoraScrapyProjectItem(), response=response)
+        loader.default_output_processor = TakeFirst()
 
         loader.add_xpath(
             'brand_name',
