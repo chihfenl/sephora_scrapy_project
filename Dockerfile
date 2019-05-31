@@ -24,6 +24,7 @@ RUN apk add --update --no-cache \
     build-base \
     python-dev \
     py-pip \
+    vim \
     jpeg-dev \
     zlib-dev \
     chromium \
