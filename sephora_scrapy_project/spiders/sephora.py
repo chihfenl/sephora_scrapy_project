@@ -138,4 +138,4 @@ class SephoraSpider(CrawlSpider):
         image_url = self.get_image_url(response)
         loader.add_value('image_url', image_url)
 
-        return loader.load_item()
+        yield loader.load_item()

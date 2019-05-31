@@ -91,7 +91,7 @@ DOWNLOADER_MIDDLEWARES = {
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     'scrapy.pipelines.images.ImagesPipeline': 1,
-    'sephora_scrapy_project.pipelines.SephoraScrapyProjectPipeline': 300,
+    'sephora_scrapy_project.pipelines.CsvExportorPipeline': 300,
 }
 
 #IMAGES_STORE = '/Users/chih-fenglin/Documents/github_project/web-scraping-project/sephora_scrapy_project'
