@@ -27,6 +27,7 @@ RUN apk add --update --no-cache \
     vim \
     jpeg-dev \
     zlib-dev \
+    tmux \
     chromium \
     libexif \
     udev \
@@ -39,4 +40,4 @@ RUN pip install -r requirements.txt \
 
 COPY . .
 
-CMD scrapy crawl sephora_test
+CMD scrapy crawl sephora
