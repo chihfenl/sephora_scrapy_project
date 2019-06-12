@@ -17,7 +17,7 @@ from libs.sephora_next_link_extractor import SephoraNextLinkExtractor
 class SephoraTestSpider(CrawlSpider):
     name = 'sephora_test'
     allowed_domains = ['sephora.com']
-    start_urls = ['https://www.sephora.com/brand/artis/all']
+    start_urls = ['https://www.sephora.com/brand/calvin-klein/all']
     handle_httpstatus_list = [301, 302]
 
     rules = [
@@ -32,6 +32,36 @@ class SephoraTestSpider(CrawlSpider):
             callback='parse_item'
         )
     ]
+
+    def get_detail_and_ingredient_column_num(self, response, col_name):
+
+        index = 0
+        col_num = None
+
+        for tab_name in response.xpath(
+            "//div[@data-at='product_tabs_section']" +
+            "//div[@role='tablist']//button//text()"
+        ).extract():
+
+            if tab_name == col_name:
+                col_num = str(index)
+            index += 1
+
+        return col_num
+
+    def get_detail_and_ingredient_xpath(self, response, col_name):
+
+        col_num = self.get_detail_and_ingredient_column_num(response, col_name)
+
+        if not col_num:
+            return None
+
+        tabpanel_number = ''.join(['tabpanel', col_num])
+        xpath_str = \
+            "//div[@data-at='product_tabs_section']" + \
+            "//div[@id='{}']".format(tabpanel_number) + \
+            "//div[@class='css-pz80c5']//text()"
+        return xpath_str
 
     def parse_item(self, response):
 
@@ -78,5 +108,15 @@ class SephoraTestSpider(CrawlSpider):
             'price',
             "//div[@data-comp='Price Box']//text()"
         )
+
+        details_xpath = \
+            self.get_detail_and_ingredient_xpath(response, 'Details')
+        if details_xpath:
+            loader.add_xpath('details', details_xpath)
+
+        ingredient_xpath = \
+            self.get_detail_and_ingredient_xpath(response, 'Ingredients')
+        if ingredient_xpath:
+            loader.add_xpath('ingredients', ingredient_xpath)
 
         yield loader.load_item()
