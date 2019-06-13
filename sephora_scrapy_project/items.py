@@ -8,6 +8,7 @@
 import scrapy
 from scrapy.loader.processors import Join, MapCompose
 from w3lib.html import remove_tags
+from w3lib.html import replace_escape_chars
 
 
 class SephoraScrapyProjectItem(scrapy.Item):
@@ -16,11 +17,11 @@ class SephoraScrapyProjectItem(scrapy.Item):
     item_name = scrapy.Field()
     price = scrapy.Field()
     details = scrapy.Field(
-        input_processor=MapCompose(remove_tags),
+        input_processor=MapCompose(remove_tags, replace_escape_chars),
         output_processor=Join(),
     )
     ingredients = scrapy.Field(
-        input_processor=MapCompose(remove_tags),
+        input_processor=MapCompose(remove_tags, replace_escape_chars),
         output_processor=Join(),
     )
     image_url = scrapy.Field()
