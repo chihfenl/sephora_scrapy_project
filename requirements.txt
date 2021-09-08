@@ -1,6 +1,6 @@
 Scrapy==1.6.0
 selenium==3.141.0
 scrapy-splash==0.7.2
-Pillow==6.0.0
+Pillow==8.3.2
 beautifulsoup4==4.7.1
 boto3==1.9.159
