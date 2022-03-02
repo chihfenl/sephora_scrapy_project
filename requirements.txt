@@ -1,4 +1,4 @@
-Scrapy==1.6.0
+Scrapy==1.8.2
 selenium==3.141.0
 scrapy-splash==0.7.2
 Pillow==6.0.0
